@@ -27,3 +27,18 @@ type User struct {
 	RefreshToken    string        `bson:"refresh_token" json:"refresh_token"`
 	FavouriteGenres []Genre       `bson:"genres" json:"genres" validate:"dive"`
 }
+
+type UserLogin struct {
+	Email    string `json:"email" validate:"required,email"`
+	Password string `json:"password" validate:"required,min=8"`
+}
+
+// UserResponse The DTO of the User
+type UserResponse struct {
+	UserID          string  `json:"user_id"`
+	FirstName       string  `json:"first_name"`
+	LastName        string  `json:"last_name"`
+	Email           string  `json:"email"`
+	Role            Role    `json:"role"`
+	FavouriteGenres []Genre `json:"favourite_genres"`
+}

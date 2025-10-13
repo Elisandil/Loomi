@@ -5,8 +5,8 @@ import (
 	"net/http"
 	"time"
 
-	"loomi/server/movies/database"
-	"loomi/server/movies/models"
+	"server/database"
+	"server/models"
 
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
@@ -70,6 +70,13 @@ func AddMovie() gin.HandlerFunc {
 		}
 		if err := validate.Struct(movie); err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"Error": "Validation failed", "details": err.Error()})
+			return
+		}
+
+		var existingMovie models.Movie
+		err := movieCollection.FindOne(ctx, bson.M{"title": movie.Title}).Decode(&existingMovie)
+		if err == nil {
+			c.JSON(http.StatusConflict, gin.H{"Error": "A movie with this title already exists"})
 			return
 		}
 
