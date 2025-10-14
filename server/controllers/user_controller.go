@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	"context"
 	"net/http"
 	"time"
 
@@ -40,7 +39,7 @@ func RegisterUser() gin.HandlerFunc {
 			c.JSON(http.StatusInternalServerError, gin.H{"Error": "Unable to hash password"})
 		}
 
-		var ctx, cancel = context.WithTimeout(context.Background(), 100*time.Second)
+		var ctx, cancel = getDBContext()
 		defer cancel()
 
 		count, err := usersCollection.CountDocuments(ctx, bson.M{"email": user.Email})
@@ -75,7 +74,7 @@ func LoginUser() gin.HandlerFunc {
 			return
 		}
 
-		ctx, cancel := context.WithTimeout(context.Background(), 100*time.Second)
+		ctx, cancel := getDBContext()
 		defer cancel()
 
 		var foundUser models.User
