@@ -15,4 +15,5 @@ func SetupProtectedRoutes(router *gin.Engine) {
 	router.POST("/add_movie", controllers.AddMovie())
 	router.PUT("/update_movie/:imdb_id", controllers.UpdateMovie())
 	router.DELETE("/delete_movie/:imdb_id", controllers.DeleteMovie())
+	router.GET("/recommended_movies", controllers.GetRecommendedMovies())
 }
