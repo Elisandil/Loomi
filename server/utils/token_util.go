@@ -3,6 +3,7 @@ package utils
 import (
 	"context"
 	"errors"
+	"fmt"
 	"os"
 	"time"
 
@@ -99,17 +100,11 @@ func ValidateToken(tokenString string) (*SignedDetails, error) {
 }
 
 func GetUserIdFromContext(c *gin.Context) (string, error) {
-	userId, exists := c.Get("userId")
-	if !exists {
-		return "", errors.New("userId does not exists in this context")
-	}
+	return getContextValue(c, "userId")
+}
 
-	id, ok := userId.(string)
-	if !ok {
-		return "", errors.New("unable to retrieve userId")
-	}
-
-	return id, nil
+func GetRoleFromContext(c *gin.Context) (string, error) {
+	return getContextValue(c, "role")
 }
 
 // ------------------------------------------------------------------------------------
@@ -137,4 +132,18 @@ func generateToken(email, firstName, lastName, role, userId, secret string,
 	}
 
 	return signedToken, nil
+}
+
+func getContextValue(c *gin.Context, key string) (string, error) {
+	value, exists := c.Get(key)
+	if !exists {
+		return "", fmt.Errorf("%s does not exist in context", key)
+	}
+
+	str, ok := value.(string)
+	if !ok {
+		return "", fmt.Errorf("unable to retrieve %s: invalid type", key)
+	}
+
+	return str, nil
 }

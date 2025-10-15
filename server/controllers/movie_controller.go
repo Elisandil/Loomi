@@ -1,8 +1,12 @@
 package controllers
 
 import (
+	"bytes"
 	"context"
+	"encoding/json"
 	"errors"
+	"fmt"
+	"io"
 	"log"
 	"net/http"
 	"os"
@@ -165,6 +169,16 @@ func DeleteMovie() gin.HandlerFunc {
 
 func AdminReviewUpdate() gin.HandlerFunc {
 	return func(c *gin.Context) {
+		role, err := utils.GetRoleFromContext(c)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"Error": "Role not found in context"})
+			return
+		}
+		if role != "ADMIN" {
+			c.JSON(http.StatusUnauthorized, gin.H{"Error": "User is not an ADMIN"})
+			return
+		}
+
 		movieId := c.Param("imdb_id")
 		if movieId == "" {
 			c.JSON(http.StatusBadRequest, gin.H{"Error": "Movie Id required"})
@@ -179,7 +193,7 @@ func AdminReviewUpdate() gin.HandlerFunc {
 			return
 		}
 
-		sentiment, rankVal, err := getReviewRanking(req.AdminReview)
+		sentiment, rankVal, err := getReviewRankingWithHugging(req.AdminReview)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"Error": "Error getting review ranking"})
 			return
@@ -321,7 +335,119 @@ func getDBContext() (context.Context, context.CancelFunc) {
 	return context.WithTimeout(context.Background(), dbTimeout)
 }
 
-func getReviewRanking(adminReview string) (string, int, error) {
+func getReviewRankingWithHugging(adminReview string) (string, int, error) {
+	rankings, err := getRankings()
+	if err != nil {
+		return "", 0, err
+	}
+
+	sentiment := ""
+	for _, ranking := range rankings {
+		if ranking.RankingValue != 999 {
+			sentiment = sentiment + ranking.RankingName + ","
+		}
+	}
+	sentiment = strings.Trim(sentiment, ",")
+
+	// test development
+	err = godotenv.Load(".env")
+	if err != nil {
+		log.Println("Warning: .env file not found")
+	}
+
+	basePromptTemplate := os.Getenv("BASE_PROMPT_TEMPLATE")
+	basePrompt := strings.Replace(basePromptTemplate, "{rankings}", sentiment, 1)
+	fullPrompt := basePrompt + adminReview
+
+	var response string
+
+	hfToken := os.Getenv("HUGGING_FACE_HUB_TOKEN")
+	hfModel := os.Getenv("HF_MODEL")
+
+	if hfToken == "" {
+		return "", 0, errors.New("HUGGING_FACE_HUB_TOKEN not set")
+	}
+	if hfModel == "" {
+		return "", 0, errors.New("HF_MODEL not set")
+	}
+
+	response, err = callHuggingFaceAPI(hfToken, hfModel, fullPrompt)
+	if err != nil {
+		return "", 0, err
+	}
+
+	rankVal := 0
+	for _, ranking := range rankings {
+		if ranking.RankingName == response {
+			rankVal = ranking.RankingValue
+			break
+		}
+	}
+
+	return response, rankVal, nil
+}
+
+func callHuggingFaceAPI(token, model, prompt string) (string, error) {
+	url := fmt.Sprintf("https://api-inference.huggingface.co/models/%s", model)
+
+	payload := map[string]interface{}{
+		"inputs": prompt,
+		"parameters": map[string]interface{}{
+			"max_new_tokens": 50,
+			"temperature":    0.1,
+		},
+	}
+
+	jsonData, err := json.Marshal(payload)
+	if err != nil {
+		return "", err
+	}
+
+	req, err := http.NewRequest("POST", url, bytes.NewBuffer(jsonData))
+	if err != nil {
+		return "", err
+	}
+
+	req.Header.Set("Authorization", "Bearer "+token)
+	req.Header.Set("Content-Type", "application/json")
+
+	client := &http.Client{Timeout: 30 * time.Second}
+	resp, err := client.Do(req)
+	if err != nil {
+		return "", err
+	}
+	defer func() {
+		if closeErr := resp.Body.Close(); closeErr != nil {
+			log.Printf("Error closing response body: %v", closeErr)
+		}
+	}()
+
+	if resp.StatusCode != http.StatusOK {
+		body, _ := io.ReadAll(resp.Body)
+		return "", fmt.Errorf("HuggingFace API error: %s - %s", resp.Status, string(body))
+	}
+
+	var result []map[string]interface{}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
+		return "", err
+	}
+
+	if len(result) == 0 {
+		return "", errors.New("empty response from HuggingFace")
+	}
+
+	generatedText, ok := result[0]["generated_text"].(string)
+	if !ok {
+		return "", errors.New("invalid response format from HuggingFace")
+	}
+
+	generatedText = strings.TrimPrefix(generatedText, prompt)
+	generatedText = strings.TrimSpace(generatedText)
+
+	return generatedText, nil
+}
+
+func getReviewRankingOpenAi(adminReview string) (string, int, error) {
 	rankings, err := getRankings()
 	if err != nil {
 		return "", 0, err
