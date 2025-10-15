@@ -1,0 +1,55 @@
+# Archivos de configuración de JetBrains IDE (GoLand, IntelliJ, etc.)
+.idea/
+*.iml
+
+# Archivos de sistema
+.DS_Store
+Thumbs.db
+
+# Archivos de compilación de Go
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# Archivos binarios y de salida
+*.test
+*.out
+
+# Carpeta de builds
+bin/
+build/
+dist/
+
+# Módulos y dependencias
+vendor/
+
+# Cache y archivos temporales de Go
+*.log
+*.tmp
+*.swp
+*.swo
+
+# Archivos de cobertura
+*.cover
+*.coverprofile
+coverage.out
+
+# Archivos de GoLand específicos
+.idea/**/workspace.xml
+.idea/**/tasks.xml
+.idea/**/dictionaries
+.idea/**/shelf/
+.idea/**/dataSources/
+.idea/**/dataSources.ids
+.idea/**/dataSources.local.xml
+.idea/**/sqlDataSources.xml
+.idea/**/dynamic.xml
+.idea/**/uiDesigner.xml
+.idea/**/gradle.xml
+.idea/**/libraries/
+
+# Archivos de configuración local
+*.local
+.env
