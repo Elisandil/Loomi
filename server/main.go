@@ -10,6 +10,7 @@ import (
 func main() {
 	// entry point of the application
 	router := gin.Default()
+
 	routes.SetupUnprotectedRoutes(router)
 	routes.SetupProtectedRoutes(router)
 	if err := router.Run(":8080"); err != nil {
