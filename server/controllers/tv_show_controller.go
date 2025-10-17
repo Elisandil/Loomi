@@ -9,11 +9,13 @@ import (
 	"server/models"
 
 	"github.com/gin-gonic/gin"
+	"github.com/go-playground/validator/v10"
 	"go.mongodb.org/mongo-driver/v2/bson"
 	"go.mongodb.org/mongo-driver/v2/mongo"
 )
 
 var tvShowCollection *mongo.Collection = database.OpenCollection("tv_shows")
+var tvShowValidator = validator.New()
 
 func GetTVShows() gin.HandlerFunc {
 	return func(c *gin.Context) {
@@ -97,6 +99,44 @@ func GetTVShowSeason() gin.HandlerFunc {
 		}
 
 		c.JSON(http.StatusOK, foundSeason)
+	}
+}
+
+func AddTVShow() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		ctx, cancel := getDBContext()
+		defer cancel()
+
+		var tvShow models.TVShow
+		if err := c.ShouldBindJSON(&tvShow); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"Error": "Invalid input", "details": err.Error()})
+			return
+		}
+		if len(tvShow.Seasons) != tvShow.TotalSeasons {
+			c.JSON(http.StatusBadRequest, gin.H{"Error": "Total seasons doesn't match the number of seasons provided"})
+			return
+		}
+
+		if err := tvShowValidator.Struct(tvShow); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"Error": "Validation failed", "details": err.Error()})
+			return
+		}
+
+		var existingShow models.TVShow
+
+		err := tvShowCollection.FindOne(ctx, bson.M{"title": tvShow.Title}).Decode(&existingShow)
+		if err == nil {
+			c.JSON(http.StatusConflict, gin.H{"Error": "A TV show with this title already exists"})
+			return
+		}
+
+		result, err := tvShowCollection.InsertOne(ctx, tvShow)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"Error": "Failed to add TV show"})
+			return
+		}
+
+		c.JSON(http.StatusCreated, result)
 	}
 }
 
