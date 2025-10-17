@@ -25,4 +25,5 @@ func SetupProtectedRoutes(router *gin.Engine) {
 	router.GET("/tv_show/:imdb_id/season/:season_number", controllers.GetTVShowSeason())
 	router.POST("/add_tv_show", controllers.AddTVShow())
 	router.PUT("/update_tv_show/:imdb_id", controllers.UpdateTVShow())
+	router.POST("/tv_show/:imdb_id/add_season", controllers.AddSeason())
 }

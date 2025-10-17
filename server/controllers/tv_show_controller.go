@@ -183,6 +183,59 @@ func UpdateTVShow() gin.HandlerFunc {
 	}
 }
 
+func AddSeason() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		ctx, cancel := getDBContext()
+		defer cancel()
+
+		imdbID := c.Param("imdb_id")
+		if imdbID == "" {
+			c.JSON(http.StatusBadRequest, gin.H{"Error": "ID is required"})
+			return
+		}
+
+		var season models.Season
+		if err := c.ShouldBindJSON(&season); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"Error": "Invalid input"})
+			return
+		}
+
+		if err := tvShowValidator.Struct(season); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"Error": "Validation failed", "details": err.Error()})
+			return
+		}
+
+		var tvShow models.TVShow
+		err := tvShowCollection.FindOne(ctx, bson.M{"imdb_id": imdbID}).Decode(&tvShow)
+		if err != nil {
+			c.JSON(http.StatusNotFound, gin.H{"Error": "Season already exists"})
+			return
+		}
+		for _, s := range tvShow.Seasons {
+			if s.SeasonNumber == season.SeasonNumber {
+				c.JSON(http.StatusConflict, gin.H{"Error": "Season already exists"})
+				return
+			}
+		}
+
+		update := bson.M{
+			"$push": bson.M{"seasons": season},
+			"$inc":  bson.M{"total_seasons": 1},
+		}
+
+		result, err := tvShowCollection.UpdateOne(ctx, bson.M{"imdb_id": imdbID}, update)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"Error": "Failed to add season"})
+			return
+		}
+
+		c.JSON(http.StatusCreated, gin.H{
+			"Message":        "Season added successfully",
+			"modified_count": result.ModifiedCount,
+		})
+	}
+}
+
 // Utility functions
 // ---------------------------------------------------------------------------------------
 
