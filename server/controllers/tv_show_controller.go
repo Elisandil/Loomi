@@ -140,6 +140,49 @@ func AddTVShow() gin.HandlerFunc {
 	}
 }
 
+func UpdateTVShow() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		ctx, cancel := getDBContext()
+		defer cancel()
+
+		imdbID := c.Param("imdb_id")
+		if imdbID == "" {
+			c.JSON(http.StatusBadRequest, gin.H{"Error": "IMDB ID is required"})
+			return
+		}
+
+		var tvShow models.TVShow
+		if err := c.ShouldBindJSON(&tvShow); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"Error": "Invalid input"})
+			return
+		}
+
+		if err := tvShowValidator.Struct(tvShow); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"Error": "Validation failed", "details": err.Error()})
+			return
+		}
+
+		result, err := tvShowCollection.ReplaceOne(
+			ctx,
+			bson.M{"imdb_id": imdbID},
+			tvShow,
+		)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"Error": "Failed to update TV show"})
+			return
+		}
+		if result.MatchedCount == 0 {
+			c.JSON(http.StatusNotFound, gin.H{"Error": "TV show not found"})
+			return
+		}
+
+		c.JSON(http.StatusOK, gin.H{
+			"Message":        "TV show updated successfully",
+			"modified_count": result.ModifiedCount,
+		})
+	}
+}
+
 // Utility functions
 // ---------------------------------------------------------------------------------------
 
