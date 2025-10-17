@@ -327,6 +327,7 @@ func GetRecommendedMovies() gin.HandlerFunc {
 	}
 }
 
+// Utility functions
 // ---------------------------------------------------------------------------------------
 
 const dbTimeout = 100 * time.Second

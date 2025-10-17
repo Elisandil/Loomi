@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"errors"
+	"fmt"
 	"net/http"
 
 	"server/database"
@@ -60,4 +61,52 @@ func GetTVShow() gin.HandlerFunc {
 
 		c.JSON(http.StatusOK, tvShow)
 	}
+}
+
+func GetTVShowSeason() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		ctx, cancel := getDBContext()
+		defer cancel()
+
+		imdbID := c.Param("imdb_id")
+		seasonNumber := c.Param("season_number")
+
+		if imdbID == "" || seasonNumber == "" {
+			c.JSON(http.StatusBadRequest, gin.H{"Error": "IMDB ID and season number are required"})
+			return
+		}
+
+		var tvShow models.TVShow
+		err := tvShowCollection.FindOne(ctx, bson.M{"imdb_id": imdbID}).Decode(&tvShow)
+		if err != nil {
+			c.JSON(http.StatusNotFound, gin.H{"Error": "TV show not found"})
+			return
+		}
+
+		var foundSeason *models.Season
+		for _, season := range tvShow.Seasons {
+			if season.SeasonNumber == parseSeasonNumber(seasonNumber) {
+				foundSeason = &season
+				break
+			}
+		}
+
+		if foundSeason == nil {
+			c.JSON(http.StatusNotFound, gin.H{"Error": "Season not found"})
+			return
+		}
+
+		c.JSON(http.StatusOK, foundSeason)
+	}
+}
+
+// Utility functions
+// ---------------------------------------------------------------------------------------
+
+func parseSeasonNumber(s string) int {
+	var num int
+	if _, err := fmt.Sscanf(s, "%d", &num); err != nil {
+		return 0
+	}
+	return num
 }
