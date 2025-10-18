@@ -236,6 +236,31 @@ func AddSeason() gin.HandlerFunc {
 	}
 }
 
+func DeleteTVShow() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		ctx, cancel := getDBContext()
+		defer cancel()
+
+		imdbID := c.Param("imdb_id")
+		if imdbID == "" {
+			c.JSON(http.StatusBadRequest, gin.H{"Error": "IMDB ID is required"})
+			return
+		}
+
+		result, err := tvShowCollection.DeleteOne(ctx, bson.M{"imdb_id": imdbID})
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"Error": "Failed to delete TV show"})
+			return
+		}
+		if result.DeletedCount == 0 {
+			c.JSON(http.StatusNotFound, gin.H{"Error": "TV show not found"})
+			return
+		}
+
+		c.JSON(http.StatusOK, gin.H{"Message": "TV show deleted successfully"})
+	}
+}
+
 // Utility functions
 // ---------------------------------------------------------------------------------------
 
