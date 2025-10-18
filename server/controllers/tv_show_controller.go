@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"server/utils"
 
 	"server/database"
 	"server/models"
@@ -258,6 +259,69 @@ func DeleteTVShow() gin.HandlerFunc {
 		}
 
 		c.JSON(http.StatusOK, gin.H{"Message": "TV show deleted successfully"})
+	}
+}
+
+func AdminTVShowReviewUpdate() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		role, err := utils.GetRoleFromContext(c)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"Error": "Role not found in context"})
+			return
+		}
+		if role != "ADMIN" {
+			c.JSON(http.StatusUnauthorized, gin.H{"Error": "User is not an ADMIN"})
+			return
+		}
+
+		imdbID := c.Param("imdb_id")
+		if imdbID == "" {
+			c.JSON(http.StatusBadRequest, gin.H{"Error": "IMDB ID required"})
+			return
+		}
+
+		var req struct {
+			AdminReview string `json:"admin_review"`
+		}
+		if err := c.ShouldBindJSON(&req); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"Error": "Invalid request body"})
+			return
+		}
+
+		sentiment, rankVal, err := getReviewRankingWithHugging(req.AdminReview)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"Error": "Error getting review ranking"})
+			return
+		}
+
+		filter := bson.M{"imdb_id": imdbID}
+		update := bson.M{
+			"$set": bson.M{
+				"admin_review": req.AdminReview,
+				"ranking": bson.M{
+					"ranking_value": rankVal,
+					"ranking_name":  sentiment,
+				},
+			},
+		}
+
+		ctx, cancel := getDBContext()
+		defer cancel()
+
+		result, err := tvShowCollection.UpdateOne(ctx, filter, update)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"Error": "Error updating TV show"})
+			return
+		}
+		if result.MatchedCount == 0 {
+			c.JSON(http.StatusNotFound, gin.H{"Error": "TV show not found"})
+			return
+		}
+
+		c.JSON(http.StatusOK, gin.H{
+			"ranking_name": sentiment,
+			"admin_review": req.AdminReview,
+		})
 	}
 }
 
