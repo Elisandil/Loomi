@@ -13,6 +13,7 @@ import (
 	"github.com/go-playground/validator/v10"
 	"go.mongodb.org/mongo-driver/v2/bson"
 	"go.mongodb.org/mongo-driver/v2/mongo"
+	"go.mongodb.org/mongo-driver/v2/mongo/options"
 )
 
 var tvShowCollection *mongo.Collection = database.OpenCollection("tv_shows")
@@ -322,6 +323,47 @@ func AdminTVShowReviewUpdate() gin.HandlerFunc {
 			"ranking_name": sentiment,
 			"admin_review": req.AdminReview,
 		})
+	}
+}
+
+func GetRecommendedTVShows() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		userId, err := utils.GetUserIdFromContext(c)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"Error": "User ID not found"})
+			return
+		}
+
+		favouriteGenres, err := GetUsersFavouriteGenres(userId)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"Error": err.Error()})
+			return
+		}
+
+		var recommendedLimit int64 = 5
+		findOptions := options.Find()
+		findOptions.SetSort(bson.D{{Key: "ranking.ranking_value", Value: 1}})
+		findOptions.SetLimit(recommendedLimit)
+
+		filter := bson.M{"genre.genre_name": bson.M{"$in": favouriteGenres}}
+
+		ctx, cancel := getDBContext()
+		defer cancel()
+
+		cursor, err := tvShowCollection.Find(ctx, filter, findOptions)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"Error": "Error fetching recommended TV shows"})
+			return
+		}
+		defer cursor.Close(ctx)
+
+		var recommendedShows []models.TVShow
+		if err := cursor.All(ctx, &recommendedShows); err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"Error": err.Error()})
+			return
+		}
+
+		c.JSON(http.StatusOK, recommendedShows)
 	}
 }
 

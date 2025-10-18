@@ -28,4 +28,5 @@ func SetupProtectedRoutes(router *gin.Engine) {
 	router.POST("/tv_show/:imdb_id/add_season", controllers.AddSeason())
 	router.DELETE("/delete_tv_show/:imdb_id", controllers.DeleteTVShow())
 	router.PATCH("/update_tv_show_review/:imdb_id", controllers.AdminTVShowReviewUpdate())
+	router.GET("/recommended_tv_shows", controllers.GetRecommendedTVShows())
 }
