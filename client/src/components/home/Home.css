@@ -1,0 +1,297 @@
+.home-container {
+    min-height: 100vh;
+    background: linear-gradient(135deg, #1a1a1a 0%, #2d1810 50%, #1a1a1a 100%);
+    padding: 20px;
+}
+
+/* Featured Section */
+.featured-section {
+    position: relative;
+    height: 400px;
+    margin-bottom: 30px;
+    border-radius: 20px;
+    overflow: hidden;
+}
+
+.featured-card {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+    background-position: center;
+    opacity: 0;
+    transition: opacity 0.5s ease-in-out;
+    border-radius: 20px;
+}
+
+.featured-card.active {
+    opacity: 1;
+}
+
+.featured-overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 40px;
+    background: linear-gradient(to top, rgba(0,0,0,0.95), transparent);
+}
+
+.featured-title {
+    color: white;
+    font-size: 48px;
+    font-weight: bold;
+    margin-bottom: 20px;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+}
+
+.play-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 30px;
+    background: linear-gradient(135deg, #ff6b35 0%, #ff8c42 100%);
+    border: 2px solid rgba(255, 107, 53, 0.5);
+    border-radius: 30px;
+    color: white;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(255, 107, 53, 0.3);
+}
+
+.play-button:hover {
+    background: linear-gradient(135deg, #ff8c42 0%, #ffb347 100%);
+    transform: scale(1.05);
+    box-shadow: 0 6px 20px rgba(255, 107, 53, 0.5);
+}
+
+.play-icon {
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: white;
+    color: #ff6b35;
+    border-radius: 50%;
+    font-size: 12px;
+}
+
+/* Genre Filter */
+.genre-filter {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 30px;
+    overflow-x: auto;
+    padding: 10px 0;
+    scrollbar-width: none;
+}
+
+.genre-filter::-webkit-scrollbar {
+    display: none;
+}
+
+.genre-button {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 20px;
+    background: rgba(26, 26, 26, 0.8);
+    backdrop-filter: blur(10px);
+    border: 2px solid rgba(255, 107, 53, 0.3);
+    border-radius: 25px;
+    color: #ffa366;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    white-space: nowrap;
+}
+
+.genre-button:hover {
+    background: rgba(255, 107, 53, 0.2);
+    border-color: rgba(255, 107, 53, 0.6);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(255, 107, 53, 0.3);
+}
+
+.genre-button.active {
+    background: linear-gradient(135deg, #ff6b35 0%, #ff8c42 100%);
+    border-color: #ff6b35;
+    color: white;
+    box-shadow: 0 4px 15px rgba(255, 107, 53, 0.5);
+}
+
+.genre-icon {
+    font-size: 18px;
+}
+
+/* Movies Section */
+.movies-section {
+    background: rgba(26, 26, 26, 0.6);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 107, 53, 0.2);
+    border-radius: 20px;
+    padding: 30px;
+}
+
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+}
+
+.section-header h3 {
+    color: #ff8c42;
+    font-size: 24px;
+    font-weight: 600;
+    margin: 0;
+}
+
+.view-controls {
+    display: flex;
+    gap: 10px;
+}
+
+.control-btn {
+    width: 40px;
+    height: 40px;
+    background: rgba(26, 26, 26, 0.8);
+    border: 1px solid rgba(255, 107, 53, 0.4);
+    border-radius: 10px;
+    color: #ff8c42;
+    font-size: 16px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.control-btn:hover {
+    background: rgba(255, 107, 53, 0.2);
+    border-color: #ff6b35;
+    box-shadow: 0 0 15px rgba(255, 107, 53, 0.3);
+}
+
+/* Movies Grid */
+.movies-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 25px;
+}
+
+.movie-card {
+    background: rgba(26, 26, 26, 0.8);
+    border: 1px solid rgba(255, 107, 53, 0.2);
+    border-radius: 15px;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.movie-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 10px 30px rgba(255, 107, 53, 0.4);
+    background: rgba(26, 26, 26, 0.95);
+    border-color: #ff6b35;
+}
+
+.movie-poster {
+    position: relative;
+    width: 100%;
+    height: 280px;
+    overflow: hidden;
+}
+
+.movie-poster img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+}
+
+.movie-card:hover .movie-poster img {
+    transform: scale(1.1);
+}
+
+.movie-badge {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    padding: 5px 12px;
+    background: linear-gradient(135deg, #ff6b35 0%, #ff8c42 100%);
+    border: 1px solid rgba(255, 107, 53, 0.5);
+    backdrop-filter: blur(5px);
+    border-radius: 20px;
+    color: white;
+    font-size: 12px;
+    font-weight: 600;
+    box-shadow: 0 2px 10px rgba(255, 107, 53, 0.4);
+}
+
+.movie-info {
+    padding: 15px;
+}
+
+.movie-title {
+    color: #ffa366;
+    font-size: 16px;
+    font-weight: 600;
+    margin: 0 0 8px 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.movie-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: rgba(255, 163, 102, 0.7);
+    font-size: 14px;
+}
+
+.rating {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    color: #ff8c42;
+}
+
+/* Loading & Messages */
+.loading {
+    text-align: center;
+    color: #ff8c42;
+    font-size: 24px;
+    padding: 60px 0;
+}
+
+.no-movies {
+    text-align: center;
+    color: rgba(255, 163, 102, 0.7);
+    font-size: 18px;
+    padding: 60px 0;
+    grid-column: 1 / -1;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .featured-title {
+        font-size: 32px;
+    }
+
+    .movies-grid {
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+        gap: 15px;
+    }
+
+    .genre-filter {
+        gap: 8px;
+    }
+
+    .genre-button {
+        padding: 10px 16px;
+        font-size: 13px;
+    }
+}
