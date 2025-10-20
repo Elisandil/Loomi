@@ -1,26 +1,44 @@
-import Button from 'react-bootstrap/Button'
+import './Movie.css'
 
 const Movie = ({movie}) => {
     return (
-        <div className="col-md-4 mb-4">
-            <div className="card h-100 shadow-sm">
-                <div style={{position:"relative"}}>
-                    <img src={movie.poster_path} alt={movie.title} className="card-img.top" style={{
-                        objectFit: "contain",
-                        height: "250px",
-                        width: "100%"
-                    }}/>
-
+        <div className="movie-card-wrapper">
+            <div className="movie-card-inner">
+                <div className="movie-poster-container">
+                    <img
+                        src={movie.poster_path}
+                        alt={movie.title}
+                        className="movie-poster-img"
+                    />
+                    {movie.ranking?.ranking_name && (
+                        <span className="movie-ranking-badge">
+                            {movie.ranking.ranking_name}
+                        </span>
+                    )}
+                    <div className="movie-overlay">
+                        <button className="play-btn">
+                            <span className="play-icon">▶</span>
+                        </button>
+                    </div>
                 </div>
-                <div className="card-body d-flex flex-column">
-                    <h5 className="card-title">{movie.title}</h5>
-                    <p className="card-text mb-2">{movie.imdb_id}</p>
+                <div className="movie-card-content">
+                    <h5 className="movie-card-title">{movie.title}</h5>
+                    <div className="movie-card-meta">
+                        <span className="movie-rating">
+                            ⭐ {movie.ranking?.ranking_value || 'N/A'}
+                        </span>
+                        <span className="movie-id">{movie.imdb_id}</span>
+                    </div>
+                    {movie.genre && movie.genre.length > 0 && (
+                        <div className="movie-genres">
+                            {movie.genre.slice(0, 2).map((g, index) => (
+                                <span key={index} className="genre-tag">
+                                    {g.genre_name}
+                                </span>
+                            ))}
+                        </div>
+                    )}
                 </div>
-                {movie.ranking?.ranking_name && (
-                    <span className="badge bg-dark m-3 p-2" style={{fontSize:"1rem"}}>
-                        {movie.ranking.ranking_name}
-                    </span>
-                )}
             </div>
         </div>
     )

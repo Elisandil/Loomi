@@ -1,0 +1,201 @@
+.movie-card-wrapper {
+    height: 100%;
+}
+
+.movie-card-inner {
+    background: rgba(26, 26, 26, 0.8);
+    border: 1px solid rgba(255, 107, 53, 0.2);
+    border-radius: 15px;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.movie-card-inner:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 15px 40px rgba(255, 107, 53, 0.4);
+    border-color: #ff6b35;
+    background: rgba(26, 26, 26, 0.95);
+}
+
+/* Poster Container */
+.movie-poster-container {
+    position: relative;
+    width: 100%;
+    height: 350px;
+    overflow: hidden;
+    background: #1a1a1a;
+}
+
+.movie-poster-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+}
+
+.movie-card-inner:hover .movie-poster-img {
+    transform: scale(1.1);
+}
+
+/* Ranking Badge */
+.movie-ranking-badge {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    padding: 6px 14px;
+    background: linear-gradient(135deg, #ff6b35 0%, #ff8c42 100%);
+    border: 1px solid rgba(255, 107, 53, 0.5);
+    border-radius: 20px;
+    color: white;
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    box-shadow: 0 4px 15px rgba(255, 107, 53, 0.5);
+    z-index: 2;
+}
+
+/* Overlay */
+.movie-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(to top, rgba(0,0,0,0.9), transparent);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.movie-card-inner:hover .movie-overlay {
+    opacity: 1;
+}
+
+/* Play Button */
+.play-btn {
+    width: 60px;
+    height: 60px;
+    background: linear-gradient(135deg, #ff6b35 0%, #ff8c42 100%);
+    border: 3px solid white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 20px rgba(255, 107, 53, 0.6);
+}
+
+.play-btn:hover {
+    transform: scale(1.2);
+    box-shadow: 0 6px 30px rgba(255, 107, 53, 0.8);
+}
+
+.play-icon {
+    color: white;
+    font-size: 20px;
+    margin-left: 3px;
+}
+
+/* Card Content */
+.movie-card-content {
+    padding: 20px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.movie-card-title {
+    color: #ffa366;
+    font-size: 18px;
+    font-weight: 700;
+    margin: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    line-height: 1.4;
+    min-height: 50px;
+}
+
+/* Meta Information */
+.movie-card-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 14px;
+    padding: 8px 0;
+    border-top: 1px solid rgba(255, 107, 53, 0.2);
+    border-bottom: 1px solid rgba(255, 107, 53, 0.2);
+}
+
+.movie-rating {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    color: #ff8c42;
+    font-weight: 600;
+}
+
+.movie-id {
+    color: rgba(255, 163, 102, 0.6);
+    font-size: 12px;
+    font-family: monospace;
+}
+
+/* Genres */
+.movie-genres {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-top: auto;
+}
+
+.genre-tag {
+    padding: 5px 12px;
+    background: rgba(255, 107, 53, 0.2);
+    border: 1px solid rgba(255, 107, 53, 0.4);
+    border-radius: 15px;
+    color: #ff8c42;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    transition: all 0.3s ease;
+}
+
+.genre-tag:hover {
+    background: rgba(255, 107, 53, 0.4);
+    border-color: #ff6b35;
+    transform: scale(1.05);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .movie-poster-container {
+        height: 280px;
+    }
+
+    .movie-card-title {
+        font-size: 16px;
+        min-height: 44px;
+    }
+
+    .play-btn {
+        width: 50px;
+        height: 50px;
+    }
+
+    .play-icon {
+        font-size: 16px;
+    }
+}
