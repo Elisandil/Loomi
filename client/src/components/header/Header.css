@@ -1,0 +1,205 @@
+.custom-navbar {
+    background: rgba(26, 26, 26, 0.95) !important;
+    backdrop-filter: blur(10px);
+    border-bottom: 2px solid rgba(255, 107, 53, 0.3);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+    padding: 15px 0;
+}
+
+.custom-navbar .container {
+    max-width: 100%;
+    padding-left: 20px;
+    padding-right: 20px;
+}
+
+/* Brand Logo */
+.brand-logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 28px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-right: auto;
+}
+
+.brand-icon {
+    font-size: 32px;
+    filter: drop-shadow(0 0 10px rgba(255, 107, 53, 0.5));
+}
+
+.brand-text {
+    background: linear-gradient(135deg, #ff6b35 0%, #ff8c42 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    text-shadow: 0 0 20px rgba(255, 107, 53, 0.3);
+}
+
+.brand-logo:hover {
+    transform: scale(1.05);
+}
+
+/* Nav Links */
+.nav-link-custom {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #ffa366 !important;
+    font-weight: 500;
+    padding: 10px 20px !important;
+    margin: 0 5px;
+    border-radius: 20px;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.navbar-nav.me-auto {
+    margin-left: 40px;
+}
+
+.nav-icon {
+    font-size: 18px;
+}
+
+.nav-link-custom:hover {
+    background: rgba(255, 107, 53, 0.2);
+    color: #ff8c42 !important;
+    transform: translateY(-2px);
+}
+
+.nav-link-custom.active {
+    background: linear-gradient(135deg, #ff6b35 0%, #ff8c42 100%);
+    color: white !important;
+    box-shadow: 0 4px 15px rgba(255, 107, 53, 0.4);
+}
+
+.nav-link-custom.active .nav-icon {
+    animation: bounce 0.5s ease;
+}
+
+@keyframes bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-5px); }
+}
+
+/* User Greeting */
+.user-greeting {
+    color: #ffa366;
+    margin-right: 15px;
+    font-size: 14px;
+}
+
+.user-name {
+    color: #ff8c42;
+    font-weight: 600;
+}
+
+/* Custom Buttons */
+.btn-custom {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    border-radius: 25px;
+    font-weight: 600;
+    font-size: 14px;
+    border: 2px solid transparent;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.nav-actions {
+    margin-left: 0 !important;
+}
+
+.navbar-collapse {
+    justify-content: space-between;
+}
+
+.btn-icon {
+    font-size: 16px;
+}
+
+/* Login Button */
+.btn-login {
+    background: rgba(26, 26, 26, 0.8);
+    border-color: rgba(255, 107, 53, 0.5);
+    color: #ff8c42;
+}
+
+.btn-login:hover {
+    background: rgba(255, 107, 53, 0.2);
+    border-color: #ff6b35;
+    color: #ff8c42;
+    box-shadow: 0 0 20px rgba(255, 107, 53, 0.4);
+    transform: translateY(-2px);
+}
+
+/* Register Button */
+.btn-register {
+    background: linear-gradient(135deg, #ff6b35 0%, #ff8c42 100%);
+    border-color: #ff6b35;
+    color: white;
+    box-shadow: 0 4px 15px rgba(255, 107, 53, 0.4);
+}
+
+.btn-register:hover {
+    background: linear-gradient(135deg, #ff8c42 0%, #ffb347 100%);
+    border-color: #ff8c42;
+    color: white;
+    box-shadow: 0 6px 20px rgba(255, 107, 53, 0.6);
+    transform: translateY(-2px);
+}
+
+/* Logout Button */
+.btn-logout {
+    background: rgba(26, 26, 26, 0.8);
+    border-color: rgba(255, 107, 53, 0.5);
+    color: #ff8c42;
+}
+
+.btn-logout:hover {
+    background: rgba(220, 53, 69, 0.2);
+    border-color: #dc3545;
+    color: #dc3545;
+    box-shadow: 0 0 20px rgba(220, 53, 69, 0.4);
+}
+
+/* Navbar Toggle */
+.custom-toggler {
+    border-color: rgba(255, 107, 53, 0.5);
+}
+
+.custom-toggler:focus {
+    box-shadow: 0 0 0 0.25rem rgba(255, 107, 53, 0.25);
+}
+
+.custom-toggler .navbar-toggler-icon {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba%28255, 140, 66, 1%29' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+}
+
+/* Responsive */
+@media (max-width: 991px) {
+    .nav-link-custom {
+        margin: 5px 0;
+    }
+
+    .btn-custom {
+        margin: 5px 0;
+        width: 100%;
+        justify-content: center;
+    }
+
+    .user-greeting {
+        margin: 10px 0;
+        display: block;
+        text-align: center;
+    }
+
+    .nav-actions {
+        margin-top: 15px;
+    }
+}
