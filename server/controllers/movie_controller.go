@@ -29,6 +29,7 @@ import (
 
 var movieCollection *mongo.Collection = database.OpenCollection("movies")
 var rankingCollection *mongo.Collection = database.OpenCollection("rankings")
+var genreCollection *mongo.Collection = database.OpenCollection("genres")
 var validate = validator.New()
 
 func GetMovies() gin.HandlerFunc {
@@ -263,7 +264,7 @@ func GetUsersFavouriteGenres(userId string) ([]string, error) {
 	for _, item := range favGenres {
 		if genreMap, ok := item.(bson.D); ok {
 			for _, elems := range genreMap {
-				if elems.Key == "range_name" {
+				if elems.Key == "genre_name" {
 					if name, ok := elems.Value.(string); ok {
 						genreNames = append(genreNames, name)
 					}
@@ -324,6 +325,29 @@ func GetRecommendedMovies() gin.HandlerFunc {
 		}
 
 		c.JSON(http.StatusOK, recommendedMovies)
+	}
+}
+
+func GetGenres() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		ctx, cancel := getDBContext()
+		defer cancel()
+
+		var genres []models.Genre
+
+		cursor, err := genreCollection.Find(ctx, bson.M{})
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"Error": "Error fetching movie genres"})
+			return
+		}
+		defer cursor.Close(ctx)
+
+		if err := cursor.All(ctx, &genres); err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			return
+		}
+
+		c.JSON(http.StatusOK, genres)
 	}
 }
 
