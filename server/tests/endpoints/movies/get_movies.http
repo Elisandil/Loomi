@@ -1,0 +1,5 @@
+### GET all the movieS from the database
+GET http://localhost:8080/movies
+Content-Type: application/json
+
+###

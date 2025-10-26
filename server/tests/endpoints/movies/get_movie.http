@@ -1,0 +1,6 @@
+### GET a movie from the database
+GET http://localhost:8080/movie/tt0060196
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJFbWFpbCI6ImNyYWlnZGVudG9uQGhvdG1haWwuY29tIiwiRmlyc3ROYW1lIjoiQ3JhaWciLCJMYXN0TmFtZSI6IkRlbnRvbiIsIlJvbGUiOiJVU0VSIiwiVXNlcklEIjoiNjhlY2NjMmVmM2FiZTA5MTAxOWZiYzQ4IiwiaXNzIjoiTG9vbWkiLCJleHAiOjE3NjA0NTAyMzgsImlhdCI6MTc2MDM2MzgzOH0.rz7B2kmQ7vYNIUGT4xLqyayUnRw6jsad6n_XMgngmY4
+
+###

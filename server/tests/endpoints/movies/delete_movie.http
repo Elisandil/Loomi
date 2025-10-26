@@ -1,0 +1,5 @@
+### DELETE a movie from the database
+DELETE http://localhost:8080/delete_movie/tt0102034
+Content-Type: application/json
+
+###
