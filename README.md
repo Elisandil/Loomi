@@ -1,42 +1,59 @@
-# Movie Recommendation API
+# Loomi - Movie & TV Show Recommendation API
 
-A Go-based REST API for movie management with personalized recommendations and AI-powered sentiment analysis.
+A Go-based REST API for movies and TV shows management with personalized recommendations and AI-powered sentiment analysis.
+
+## Tech Stack
+
+- **Framework**: Gin Web Framework
+- **Database**: MongoDB (with mongo-driver v2)
+- **Authentication**: JWT (golang-jwt/jwt v5)
+- **Validation**: go-playground/validator v10
+- **Password Hashing**: bcrypt
+- **AI Integration**: HuggingFace Inference API (Groq) / OpenAI
+- **CORS**: gin-contrib/cors
+- **Environment**: godotenv
 
 ## Features
 
-- **JWT Authentication**: Secure user registration and login
-- **Movie CRUD**: Complete movie management system
-- **Personalized Recommendations**: Movie suggestions based on user's favorite genres
-- **AI Sentiment Analysis**: Automatic review classification using HuggingFace or OpenAI
-- **Role-Based Access**: User and Admin roles
+- **JWT Authentication**: Secure user registration and login with access/refresh tokens
+- **Movie & TV Show CRUD**: Complete management system for movies and TV series
+- **Personalized Recommendations**: Content suggestions based on user's favorite genres
+- **AI Sentiment Analysis**: Automatic review classification using HuggingFace (Groq) or OpenAI
+- **Role-Based Access**: User and Admin roles with different permissions
+- **Season & Episode Management**: Complete TV show tracking with seasons and episodes
 - **MongoDB**: NoSQL database for data persistence
+- **CORS Enabled**: Ready for frontend integration
 
 ## Quick Start
 
 ### Prerequisites
 
 - Go 1.24.0+
-- MongoDB
-- HuggingFace token or OpenAI API key
+- MongoDB 4.0+
+- HuggingFace token (for Groq) or OpenAI API key
 
 ### Environment Variables
 
-Create a `.env` file:
+Create a `.env` file in the `server/` directory:
 
 ```env
-MONGODB_URI=mongodb://localhost:27017
-DATABASE_NAME=movie_db
-SECRET_KEY=your_jwt_secret
-SECRET_REFRESH_KEY=your_refresh_secret
+DATABASE_NAME=Loomi-movies
+MONGODB_URI=mongodb://localhost:27017/
+SECRET_KEY=your_secret_key
+SECRET_REFRESH_KEY=your_refresh_secret_key
+BASE_PROMPT_TEMPLATE='Return a response using one of the words: {rankings}.The response should be a single word and should not contain any other text.The response should be based on the following review:'
+OPENAI_API_KEY=your_open_ai_key
+USE_HUGGING_FAME=true
 HUGGING_FACE_HUB_TOKEN=your_hf_token
-HF_MODEL=meta-llama/Llama-3.2-1B-Instruct
-BASE_PROMPT_TEMPLATE=Classify this movie review sentiment into: {rankings}. Review: 
+HF_MODEL=openai/gpt-oss-20b
+HF_INFERENCE_PROVIDER=groq
 RECOMMENDED_MOVIE_LIMIT=5
 ```
 
-### Run
+### Installation & Run
 
 ```bash
+cd server
 go mod download
 go run main.go
 ```
@@ -48,55 +65,162 @@ Server starts on `http://localhost:8080`
 ### Public Routes
 
 - `POST /register` - Create new user account
-- `POST /login` - Authenticate and get JWT token
+- `POST /login` - Authenticate and get JWT tokens
+- `GET /genres` - Get all available genres
+- `GET /movies` - Get all movies (paginated)
+- `GET /tv_shows` - Get all TV shows (paginated)
 
 ### Protected Routes
 *Requires `Authorization: Bearer <token>` header*
 
-- `GET /movies` - Get all movies
-- `GET /movie/:imdb_id` - Get single movie
-- `POST /add_movie` - Add new movie
-- `PUT /update_movie/:imdb_id` - Update movie
-- `DELETE /delete_movie/:imdb_id` - Delete movie
-- `GET /recommended_movies` - Get personalized recommendations
-- `PATCH /update_review/:imdb_id` - Update admin review (Admin only)
+#### Movies
 
-## Tech Stack
+- `GET /movie/:imdb_id` - Get single movie details
+- `POST /add_movie` - Add new movie (Admin only)
+- `PUT /update_movie/:imdb_id` - Update movie (Admin only)
+- `DELETE /delete_movie/:imdb_id` - Delete movie (Admin only)
+- `GET /recommended_movies` - Get personalized movie recommendations
+- `PATCH /update_review/:imdb_id` - Update movie review with AI analysis (Admin only)
 
-- **Framework**: Gin
-- **Database**: MongoDB
-- **Authentication**: JWT
-- **AI Integration**: HuggingFace Inference API / OpenAI
-- **Password Hashing**: bcrypt
+#### TV Shows
+
+- `GET /tv_show/:imdb_id` - Get single TV show details
+- `POST /add_tv_show` - Add new TV show (Admin only)
+- `PUT /update_tv_show/:imdb_id` - Update TV show (Admin only)
+- `DELETE /delete_tv_show/:imdb_id` - Delete TV show (Admin only)
+- `GET /recommended_tv_shows` - Get personalized TV show recommendations
+- `PATCH /update_tv_show_review/:imdb_id` - Update TV show review with AI analysis (Admin only)
+
+#### Seasons & Episodes
+
+- `POST /add_season/:imdb_id` - Add season to TV show (Admin only)
+- `PUT /update_season/:imdb_id/:season_number` - Update season (Admin only)
+- `DELETE /delete_season/:imdb_id/:season_number` - Delete season (Admin only)
+- `POST /add_episode/:imdb_id/:season_number` - Add episode to season (Admin only)
+- `PUT /update_episode/:imdb_id/:season_number/:episode_number` - Update episode (Admin only)
+- `DELETE /delete_episode/:imdb_id/:season_number/:episode_number` - Delete episode (Admin only)
 
 ## Project Structure
 
 ```
 server/
-├── controllers/    # Business logic
-├── database/       # DB connection
-├── middleware/     # Auth middleware
-├── models/         # Data models
-├── routes/         # Route definitions
-├── utils/          # Helper functions
-└── main.go         # Entry point
+├── controllers/           # Business logic
+│   ├── movie_controller.go
+│   ├── tv_show_controller.go
+│   ├── user_controller.go
+│   └── user_controller_test.go
+├── database/             # MongoDB connection
+│   └── db_conn.go
+├── middleware/           # Auth middleware
+│   └── auth_middleware.go
+├── models/               # Data models
+│   ├── movie_model.go
+│   ├── tv_show_model.go
+│   ├── season_model.go
+│   ├── episode_model.go
+│   ├── user_model.go
+│   ├── genre_model.go
+│   └── ranking_model.go
+├── routes/               # Route definitions
+│   ├── protected_routes.go
+│   └── unprotected_routes.go
+├── utils/                # Helper functions
+│   └── token_util.go
+├── resources/            # Initial data (JSON)
+│   ├── genres.json
+│   ├── movies.json
+│   ├── tv_shows.json
+│   ├── rankings.json
+│   └── users.json
+├── tests/                # HTTP test files
+│   └── endpoints/
+├── .env                  # Environment variables
+└── main.go              # Entry point
+```
+
+## Data Models
+
+### Movie
+```go
+{
+  "imdb_id": "tt1234567",
+  "title": "Movie Title",
+  "release_date": "2024-01-01T00:00:00Z",
+  "genres": ["Action", "Thriller"],
+  "duration": 120,
+  "ranking": "Must Watch",
+  "admin_review": "Amazing movie!",
+  "sentiment": "positive"
+}
+```
+
+### TV Show
+```go
+{
+  "imdb_id": "tt7654321",
+  "title": "Show Title",
+  "release_date": "2024-01-01T00:00:00Z",
+  "genres": ["Drama", "Sci-Fi"],
+  "ranking": "Must Watch",
+  "status": "Ongoing", // Ongoing, Finished, Cancelled
+  "admin_review": "Great series!",
+  "sentiment": "positive",
+  "seasons": [
+    {
+      "season_number": 1,
+      "episodes": [
+        {
+          "episode_number": 1,
+          "title": "Pilot",
+          "duration": 45,
+          "air_date": "2024-01-01T00:00:00Z"
+        }
+      ]
+    }
+  ]
+}
+```
+
+### User
+```go
+{
+  "email": "user@example.com",
+  "password": "hashed_password",
+  "role": "user", // user or admin
+  "favorite_genres": ["Action", "Sci-Fi"]
+}
 ```
 
 ## How It Works
 
-1. Users register with their favorite genres
-2. Movies are stored with genres and rankings
-3. Admins can add reviews that are automatically analyzed by AI
-4. System recommends movies matching user preferences, sorted by ranking
-5. JWT tokens secure all protected endpoints
+1. **User Registration**: Users register with email, password, and favorite genres
+2. **Content Management**: Admins can add movies/TV shows with genres and rankings
+3. **AI Review Analysis**: When admins add reviews, AI automatically classifies sentiment
+4. **Personalized Recommendations**: System suggests content matching user preferences, sorted by ranking
+5. **Season Tracking**: TV shows include complete season and episode information
+6. **Secure Access**: JWT tokens protect all user-specific and admin endpoints
+
+## AI Sentiment Analysis
+
+The system uses AI to automatically classify admin reviews into predefined rankings:
+- Reviews are sent to HuggingFace (Groq) or OpenAI
+- AI returns one of the configured rankings (e.g., "Must Watch", "Worth Watching", "Skip")
+- Sentiment is stored with the content for recommendation algorithms
 
 ## Security
 
-- Passwords hashed with bcrypt
-- JWT tokens (24h access, 7d refresh)
-- Role-based authorization
-- Protected routes with middleware validation
+- **Password Hashing**: bcrypt with cost factor 14
+- **JWT Tokens**: 
+  - Access tokens: 24 hours
+  - Refresh tokens: 7 days
+- **Role-Based Authorization**: Separate permissions for users and admins
+- **Protected Routes**: Middleware validates tokens on all protected endpoints
+- **CORS**: Configured for secure cross-origin requests
+
+## Testing
+
+HTTP test files are available in `tests/endpoints/` for manual API testing with REST clients.
 
 ---
 
-*Work in progress*
+*Built with using Go and MongoDB*
