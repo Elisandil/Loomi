@@ -24,6 +24,38 @@ A Go-based REST API for movies and TV shows management with personalized recomme
 - **MongoDB**: NoSQL database for data persistence
 - **CORS Enabled**: Ready for frontend integration
 
+## Project Structure
+
+```
+server/
+├── controllers/           # Business logic
+│   ├── movie_controller.go
+│   ├── tv_show_controller.go
+│   ├── user_controller.go
+│   └── user_controller_test.go
+├── database/             # MongoDB connection
+│   └── db_conn.go
+├── middleware/           # Auth middleware
+│   └── auth_middleware.go
+├── models/               # Data models
+│   ├── movie_model.go
+│   ├── tv_show_model.go
+│   ├── season_model.go
+│   ├── episode_model.go
+│   ├── user_model.go
+│   ├── genre_model.go
+│   └── ranking_model.go
+├── routes/               # Route definitions
+│   ├── protected_routes.go
+│   └── unprotected_routes.go
+├── utils/                # Helper functions
+│   └── token_util.go
+├── tests/                # HTTP test files
+│   └── endpoints/
+├── .env                  # Environment variables
+└── main.go              # Entry point
+```
+
 ## Quick Start
 
 ### Prerequisites
@@ -67,8 +99,8 @@ Server starts on `http://localhost:8080`
 - `POST /register` - Create new user account
 - `POST /login` - Authenticate and get JWT tokens
 - `GET /genres` - Get all available genres
-- `GET /movies` - Get all movies (paginated)
-- `GET /tv_shows` - Get all TV shows (paginated)
+- `GET /movies` - Get all movies
+- `GET /tv_shows` - Get all TV shows
 
 ### Protected Routes
 *Requires `Authorization: Bearer <token>` header*
@@ -85,58 +117,13 @@ Server starts on `http://localhost:8080`
 #### TV Shows
 
 - `GET /tv_show/:imdb_id` - Get single TV show details
+- `GET /tv_show/:imdb_id/season/:season_number` - Get a TV show season
 - `POST /add_tv_show` - Add new TV show (Admin only)
 - `PUT /update_tv_show/:imdb_id` - Update TV show (Admin only)
+- `POST /tv_show/:imdb_id/add_season` - Add season to TV show (Admin only)
 - `DELETE /delete_tv_show/:imdb_id` - Delete TV show (Admin only)
-- `GET /recommended_tv_shows` - Get personalized TV show recommendations
 - `PATCH /update_tv_show_review/:imdb_id` - Update TV show review with AI analysis (Admin only)
-
-#### Seasons & Episodes
-
-- `POST /add_season/:imdb_id` - Add season to TV show (Admin only)
-- `PUT /update_season/:imdb_id/:season_number` - Update season (Admin only)
-- `DELETE /delete_season/:imdb_id/:season_number` - Delete season (Admin only)
-- `POST /add_episode/:imdb_id/:season_number` - Add episode to season (Admin only)
-- `PUT /update_episode/:imdb_id/:season_number/:episode_number` - Update episode (Admin only)
-- `DELETE /delete_episode/:imdb_id/:season_number/:episode_number` - Delete episode (Admin only)
-
-## Project Structure
-
-```
-server/
-├── controllers/           # Business logic
-│   ├── movie_controller.go
-│   ├── tv_show_controller.go
-│   ├── user_controller.go
-│   └── user_controller_test.go
-├── database/             # MongoDB connection
-│   └── db_conn.go
-├── middleware/           # Auth middleware
-│   └── auth_middleware.go
-├── models/               # Data models
-│   ├── movie_model.go
-│   ├── tv_show_model.go
-│   ├── season_model.go
-│   ├── episode_model.go
-│   ├── user_model.go
-│   ├── genre_model.go
-│   └── ranking_model.go
-├── routes/               # Route definitions
-│   ├── protected_routes.go
-│   └── unprotected_routes.go
-├── utils/                # Helper functions
-│   └── token_util.go
-├── resources/            # Initial data (JSON)
-│   ├── genres.json
-│   ├── movies.json
-│   ├── tv_shows.json
-│   ├── rankings.json
-│   └── users.json
-├── tests/                # HTTP test files
-│   └── endpoints/
-├── .env                  # Environment variables
-└── main.go              # Entry point
-```
+- `GET /recommended_tv_shows` - Get personalized TV show recommendations
 
 ## Data Models
 
@@ -186,7 +173,7 @@ server/
 {
   "email": "user@example.com",
   "password": "hashed_password",
-  "role": "user", // user or admin
+  "role": "user", // admin by default
   "favorite_genres": ["Action", "Sci-Fi"]
 }
 ```
@@ -204,15 +191,15 @@ server/
 
 The system uses AI to automatically classify admin reviews into predefined rankings:
 - Reviews are sent to HuggingFace (Groq) or OpenAI
-- AI returns one of the configured rankings (e.g., "Must Watch", "Worth Watching", "Skip")
+- AI returns one of the configured rankings
 - Sentiment is stored with the content for recommendation algorithms
 
 ## Security
 
-- **Password Hashing**: bcrypt with cost factor 14
+- **Password Hashing**: bcrypt
 - **JWT Tokens**: 
-  - Access tokens: 24 hours
-  - Refresh tokens: 7 days
+  - Access tokens
+  - Refresh tokens
 - **Role-Based Authorization**: Separate permissions for users and admins
 - **Protected Routes**: Middleware validates tokens on all protected endpoints
 - **CORS**: Configured for secure cross-origin requests
@@ -223,4 +210,4 @@ HTTP test files are available in `tests/endpoints/` for manual API testing with 
 
 ---
 
-*Built with using Go and MongoDB*
+*Built using Go and MongoDB*
