@@ -1,44 +1,20 @@
-import './Movie.css'
-
-const Movie = ({movie}) => {
+const Movie = ({ movie, updateMovieReview }) => {
     return (
-        <div className="movie-card-wrapper">
-            <div className="movie-card-inner">
-                <div className="movie-poster-container">
-                    <img
-                        src={movie.poster_path}
-                        alt={movie.title}
-                        className="movie-poster-img"
-                    />
-                    {movie.ranking?.ranking_name && (
-                        <span className="movie-ranking-badge">
-                            {movie.ranking.ranking_name}
-                        </span>
-                    )}
-                    <div className="movie-overlay">
-                        <button className="play-btn">
-                            <span className="play-icon">▶</span>
-                        </button>
-                    </div>
-                </div>
-                <div className="movie-card-content">
-                    <h5 className="movie-card-title">{movie.title}</h5>
-                    <div className="movie-card-meta">
-                        <span className="movie-rating">
-                            ⭐ {movie.ranking?.ranking_value || 'N/A'}
-                        </span>
-                        <span className="movie-id">{movie.imdb_id}</span>
-                    </div>
-                    {movie.genre && movie.genre.length > 0 && (
-                        <div className="movie-genres">
-                            {movie.genre.slice(0, 2).map((g, index) => (
-                                <span key={index} className="genre-tag">
-                                    {g.genre_name}
-                                </span>
-                            ))}
-                        </div>
-                    )}
-                </div>
+        <div className="stream-card">
+            <div className="stream-thumbnail">
+                <img src={movie.poster_path} alt={movie.title} />
+                {movie.ranking?.ranking_name && (
+                    <div className="movie-badge">{movie.ranking.ranking_name}</div>
+                )}
+            </div>
+            <div className="stream-info">
+                <h5 className="stream-title">{movie.title}</h5>
+                <p className="stream-author">{movie.imdb_id}</p>
+                {updateMovieReview && (
+                    <button className="view-all-btn" onClick={() => updateMovieReview(movie.imdb_id)}>
+                        Review
+                    </button>
+                )}
             </div>
         </div>
     )
